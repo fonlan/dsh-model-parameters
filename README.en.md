@@ -68,18 +68,20 @@ Models with no catalog match (e.g. a local gateway model like
   `ttlDays` (default **7 days**).
 - A failed fetch keeps the last good cache; with no cache at all the plugin
   simply fills nothing until a refresh succeeds.
-- The settings page has an **Update catalog & fill now** button for a forced
+- The settings card has an **Update catalog & fill now** button for a forced
   refresh, and shows the last update time and freshness.
 
-## Settings page
+## Settings card
 
-A "模型参数补全 / Model Parameters" section appears in DSH settings:
+An expandable "模型参数补全 / Model Parameters" card appears in DSH
+settings → **Plugins → Plugin configuration** (styled like the built-in plugin
+cards, collapsed by default):
 
 - master enable switch plus per-field toggles (`fillName`, `fillContext`,
   `fillMaxTokens`, `fillReasoning`, `fillInput`);
 - catalog TTL in days;
 - optional `provider → models.dev provider` mapping overrides;
-- catalog freshness card (entries, providers, last update);
+- catalog freshness (entries, providers, last update);
 - the last fill report: fields filled, providers touched, and the list of
   unmatched model ids.
 

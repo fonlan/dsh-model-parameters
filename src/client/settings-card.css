@@ -1,0 +1,330 @@
+/**
+ * Styles for the Model Parameters Settings Card (设置 → 插件 → 插件配置).
+ *
+ * The expandable chrome mirrors the built-in plugin cards
+ * (dsh-client-ui-settings-plugins PluginCard.module.css): external plugins
+ * cannot import PluginCard, so the shell/head/chevron/body are re-drawn with
+ * the same tokens and geometry. Inner controls follow the built-in cards'
+ * field language (ValueField): border-l2 inputs on bg-layer-3, inverted
+ * primary buttons, divider-separated groups.
+ */
+
+/* ── card chrome (aligned with the built-in PluginCard) ─────────────────── */
+
+.mp-card {
+  border: 1px solid var(--dsw-alias-border-l2, #2a3346);
+  background: var(--dsw-alias-bg-layer-3, #0d1017);
+  border-radius: 12px;
+  list-style: none;
+  transition: border-color .16s, background .16s;
+}
+
+.mp-card:hover {
+  border-color: var(--dsw-alias-label-dimmed, #4a5468);
+}
+
+.mp-card[data-open] {
+  background: var(--dsw-alias-bg-layer-2, #141a26);
+  border-color: var(--dsw-alias-label-dimmed, #4a5468);
+}
+
+.mp-card-head {
+  appearance: none;
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 12px;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  display: flex;
+}
+
+.mp-card-head:focus-visible {
+  outline: 2px solid var(--dsw-alias-brand-primary, #4f8cff);
+  outline-offset: -2px;
+}
+
+.mp-card-headText {
+  flex-direction: column;
+  flex: 1;
+  gap: 4px;
+  min-width: 0;
+  display: flex;
+}
+
+.mp-card-title {
+  color: var(--dsw-alias-label-primary, #e6e6e6);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.mp-card-sub {
+  color: var(--dsw-alias-label-tertiary, #8b93a7);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.mp-card-chevron {
+  color: var(--dsw-alias-label-tertiary, #8b93a7);
+  flex: none;
+  transition: transform .16s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mp-card-chevron[data-open] {
+  transform: rotate(180deg);
+}
+
+.mp-card-body {
+  border-top: 1px solid var(--dsw-alias-border-l2, #2a3346);
+  margin: 0 16px;
+  padding: 12px 0 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── body layout ────────────────────────────────────────────────────────── */
+
+.mp-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mp-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mp-group-title {
+  margin: 0;
+  color: var(--dsw-alias-label-primary, #e6e6e6);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.mp-divider {
+  border: none;
+  border-top: 1px solid var(--dsw-alias-border-l2, #2a3346);
+  margin: 0;
+}
+
+.mp-desc {
+  margin: 0;
+  color: var(--dsw-alias-label-tertiary, #8b93a7);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.mp-muted {
+  margin: 0;
+  color: var(--dsw-alias-label-tertiary, #8b93a7);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.mp-error {
+  margin: 0;
+  color: var(--dsw-alias-label-error, #ff8f8f);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* ── toggles ────────────────────────────────────────────────────────────── */
+
+.mp-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.mp-toggle input[type='checkbox'] {
+  margin-top: 3px;
+  accent-color: var(--dsw-alias-brand-primary, #4f8cff);
+}
+
+.mp-toggle-sub {
+  padding-left: 22px;
+}
+
+.mp-toggle-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mp-toggle-label {
+  color: var(--dsw-alias-label-primary, #e6e6e6);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.mp-toggle-desc {
+  color: var(--dsw-alias-label-tertiary, #8b93a7);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ── catalog meta / ttl ─────────────────────────────────────────────────── */
+
+.mp-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+  color: var(--dsw-alias-label-secondary, #aab2c5);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.mp-ttl {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--dsw-alias-label-secondary, #aab2c5);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* ── inputs (ValueField language) ───────────────────────────────────────── */
+
+.mp-input {
+  border: 1px solid var(--dsw-alias-border-l2, #2a3346);
+  background: var(--dsw-alias-bg-layer-3, #0d1017);
+  color: var(--dsw-alias-label-primary, #e6e6e6);
+  height: 34px;
+  border-radius: 8px;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.mp-input:focus-visible {
+  border-color: var(--dsw-alias-brand-primary, #4f8cff);
+  outline: none;
+}
+
+.mp-input:disabled {
+  color: var(--dsw-alias-label-tertiary, #8b93a7);
+  cursor: default;
+}
+
+.mp-input-narrow {
+  width: 72px;
+}
+
+/* ── mapping rows ───────────────────────────────────────────────────────── */
+
+.mp-map-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mp-map-row .mp-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.mp-map-arrow {
+  color: var(--dsw-alias-label-tertiary, #8b93a7);
+  flex: none;
+}
+
+/* ── buttons (PluginCard footer language) ────────────────────────────────── */
+
+.mp-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mp-button {
+  appearance: none;
+  font: inherit;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 5px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  background: var(--dsw-alias-label-primary, #e6e6e6);
+  color: var(--dsw-alias-bg-layer-3, #0d1017);
+}
+
+.mp-button:hover:not(:disabled) {
+  opacity: .9;
+}
+
+.mp-button:disabled {
+  opacity: .4;
+  cursor: default;
+}
+
+.mp-button:focus-visible {
+  outline: 2px solid var(--dsw-alias-brand-primary, #4f8cff);
+  outline-offset: 1px;
+}
+
+.mp-button-ghost {
+  background: transparent;
+  color: var(--dsw-alias-label-secondary, #aab2c5);
+  border-color: var(--dsw-alias-border-l2, #2a3346);
+}
+
+.mp-button-ghost:hover:not(:disabled) {
+  color: var(--dsw-alias-label-primary, #e6e6e6);
+  border-color: var(--dsw-alias-label-dimmed, #4a5468);
+}
+
+/* ── report / badges / code ─────────────────────────────────────────────── */
+
+.mp-report {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--dsw-alias-label-secondary, #aab2c5);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.mp-code {
+  background: var(--dsw-alias-bg-module-platform, rgba(128, 128, 128, 0.15));
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 12px;
+  word-break: break-all;
+}
+
+.mp-badge {
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 17px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  margin-left: 4px;
+}
+
+.mp-badge-ok {
+  background: rgba(52, 199, 89, 0.18);
+  color: #34c759;
+}
+
+.mp-badge-warn {
+  background: rgba(255, 149, 0, 0.18);
+  color: #ff9500;
+}

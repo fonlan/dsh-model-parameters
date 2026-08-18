@@ -44,16 +44,16 @@ models.dev 把同一模型挂在许多 provider 名下（`deepseek-v4-flash` 出
 - 目录从 `https://models.dev/api.json` 拉取，缓存在 `~/.dsh/model-parameters/catalog.json`（约 4 MB）。
 - 缓存超过 `ttlDays`（默认 **7 天**）后，在下一次 reconcile 时惰性刷新。
 - 拉取失败则保留上次成功的缓存；完全没有缓存时插件什么都不补，直到刷新成功。
-- 设置页有 **Update catalog & fill now** 按钮可强制刷新，并显示上次更新时间与新鲜度。
+- 设置卡片有 **立即更新目录并补全** 按钮可强制刷新，并显示上次更新时间与新鲜度。
 
-## 设置页面
+## 设置卡片
 
-DSH 设置中会出现一个 "模型参数补全 / Model Parameters" 区块：
+在 DSH 设置 → **插件 → 插件配置** 中会出现一张 "模型参数补全 / Model Parameters" 可展开卡片（样式与内置插件卡片一致，默认折叠）：
 
 - 总开关 + 逐字段开关（`fillName`、`fillContext`、`fillMaxTokens`、`fillReasoning`、`fillInput`）；
 - 目录 TTL（天）；
 - 可选的 `provider → models.dev provider` 映射覆盖；
-- 目录新鲜度卡片（条目数、provider 数、上次更新）；
+- 目录新鲜度（条目数、provider 数、上次更新）；
 - 上次补全报告：补全的字段、涉及的 provider、未匹配的模型 id 列表。
 
 插件配置保存在 `model-parameters` 设置命名空间（`~/.dsh/settings.yaml`），例如：
