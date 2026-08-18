@@ -1,0 +1,3 @@
+- insert:
+    - id: model-parameters
+      name: '@fonlan/dsh-model-parameters'
