@@ -107,6 +107,16 @@ pnpm typecheck
 node scripts/verify-catalog.mjs   # 用 models.dev dump 校验匹配逻辑
 ```
 
+## 发布
+
+打 tag 自动发布到 npm（GitHub Actions `Publish to npm`，校验 tag 与 package.json 版本一致后执行 `npm publish`，需仓库配置 `NPM_TOKEN` secret）：
+
+```bash
+npm run release:patch   # npm version patch && git push && git push --tags
+npm run release:minor
+npm run release:major
+```
+
 ## License
 
 MIT

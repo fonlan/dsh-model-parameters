@@ -137,6 +137,16 @@ pnpm typecheck
 node scripts/verify-catalog.mjs   # matching-logic check against a models.dev dump
 ```
 
+## Release
+
+Tagging auto-publishes to npm (GitHub Actions `Publish to npm` verifies the tag matches the package.json version, then runs `npm publish`; requires an `NPM_TOKEN` secret on the repo):
+
+```bash
+npm run release:patch   # npm version patch && git push && git push --tags
+npm run release:minor
+npm run release:major
+```
+
 ## License
 
 MIT

@@ -49,7 +49,10 @@
     "build": "rm -rf lib && tsc -p tsconfig.build.json && tsdown",
     "prepare": "npm run build",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.client.json",
-    "watch": "tsdown --watch"
+    "watch": "tsdown --watch",
+    "release:patch": "npm version patch && git push && git push --tags",
+    "release:minor": "npm version minor && git push && git push --tags",
+    "release:major": "npm version major && git push && git push --tags"
   },
   "dsh": {
     "bundle": {
