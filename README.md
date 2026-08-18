@@ -1,88 +1,62 @@
-# @fonlan/dsh-model-parameters
+# dsh-model-parameters
 
-DSH plugin: when a provider's model sync (or any settings write) leaves model
-entries with missing capability fields, automatically fill them from the
-[models.dev](https://models.dev) catalog — display name, context window, max
-output tokens, reasoning efforts, and input modalities.
+**中文** | [English](README.en.md)
 
-Most provider `/v1/models` listings disclose an id and nothing else. This
-plugin makes those synced models immediately usable by completing their
-metadata from a locally cached catalog, and reports what it filled and what it
-could not match.
+DSH 插件：当 provider 的模型同步（或任何设置写入）留下缺失能力字段的模型条目时，自动从 [models.dev](https://models.dev) 目录补全——显示名称（display name）、上下文窗口（context window）、最大输出 token、推理档位（reasoning efforts）和输入模态（input modalities）。
 
-## How it works
+大多数 provider 的 `/v1/models` 列表只披露一个 id，别无其他。本插件用本地缓存的目录补全这些同步模型的元数据，让它们立即可用，并报告补全了什么、哪些无法匹配。
 
-1. The plugin listens to the `llm-pi-ai` settings namespace (`settings/updated`).
-   Any committed change — a freshly synced provider, an edited provider card, a
-   manual `settings.yaml` edit — triggers a reconcile.
-2. On plugin start it also runs one backfill over the existing configuration.
-3. For every model entry missing any of `name` / `contextWindow` / `maxTokens` /
-   `reasoningEfforts` / `input`, it resolves the best catalog entry and fills
-   only the missing fields (fill-only: present values are never overwritten).
-4. The write goes through the settings seam (`ctx.settings.mutate`), i.e. it
-   lands in `~/.dsh/settings.yaml` — the same file you would edit by hand.
+## 工作原理
 
-The reconcile is fill-only by construction, so its own writes cannot loop: the
-next `settings/updated` sees the fields present and produces no ops.
+1. 插件监听 `llm-pi-ai` 设置命名空间（`settings/updated`）。任何已提交的变更——新同步的 provider、编辑过的 provider 卡片、手动编辑的 `settings.yaml`——都会触发一次 reconcile。
+2. 插件启动时还会对现有配置执行一次全量回填。
+3. 对每个缺少 `name` / `contextWindow` / `maxTokens` / `reasoningEfforts` / `input` 任一字段的模型条目，解析出最佳目录条目，只补全缺失字段（fill-only：已有值绝不覆盖）。
+4. 写入走设置接缝（`ctx.settings.mutate`），即落到 `~/.dsh/settings.yaml`——与你手动编辑的是同一个文件。
 
-## Matching
+reconcile 天然是 fill-only 的，因此它自己的写入不会造成循环：下一次 `settings/updated` 看到字段已存在，不会产生任何操作。
 
-models.dev keys the same model under many providers (`deepseek-v4-flash`
-appears under 57 providers). Resolution is deterministic and provider-aware:
+## 匹配逻辑
 
-1. **Provider match** — the models.dev provider mapped for the dsh provider
-   (explicit `providerMap` override, then the same provider id). Your
-   `opencode-go` route is also a models.dev provider, so its entries win.
-2. **Exact full-id match** — a dsh model id already carrying a `vendor/` prefix
-   matches the identical models.dev key.
-3. **First-party vendor priority** — `officialProviders` (deepseek, openai,
-   anthropic, google, xai, …) break collisions in favor of the vendor's own
-   entry.
-4. **Completeness** — entries with both limits known win over partial ones.
-5. **Alphabetical provider id** — stable last resort.
+models.dev 把同一模型挂在许多 provider 名下（`deepseek-v4-flash` 出现在 57 个 provider 下）。解析是确定性的、且 provider 感知：
 
-Bare ids are matched case-insensitively against the last path segment, so
-`qwen3.7-max` resolves `Qwen/Qwen3.7-Max` and `kimi-k2.7-code` resolves
-`Kimi-K2.7-Code`.
+1. **Provider 匹配** —— 为 dsh provider 映射的 models.dev provider（显式 `providerMap` 覆盖，其次同 id）。你的 `opencode-go` 路由本身也是 models.dev provider，所以它的条目优先。
+2. **完整 id 精确匹配** —— 已带 `vendor/` 前缀的 dsh 模型 id 与完全相同的 models.dev key 匹配。
+3. **官方 vendor 优先** —— `officialProviders`（deepseek、openai、anthropic、google、xai……）在冲突时偏向厂商自己的条目。
+4. **完整性** —— 两个 limit 都已知的条目优于部分已知的。
+5. **provider id 字母序** —— 稳定的兜底。
 
-## Filled fields
+裸 id 对最后一段路径段做大小写不敏感匹配，所以 `qwen3.7-max` 解析到 `Qwen/Qwen3.7-Max`，`kimi-k2.7-code` 解析到 `Kimi-K2.7-Code`。
 
-| dsh field | models.dev source | notes |
+## 补全字段
+
+| dsh 字段 | models.dev 来源 | 说明 |
 |---|---|---|
-| `name` | `name` | display name |
-| `contextWindow` | `limit.context` | tokens |
-| `maxTokens` | `limit.output` | tokens |
-| `reasoningEfforts` | `reasoning_options[type=effort].values` | identity dict `{high:"high", max:"max"}`; values outside pi-ai's levels (`default`/`none`/…) are filtered; `toggle`/`budget_tokens` options are ignored |
-| `input` | `modalities.input` | filtered to `text`/`image` (the only modalities pi-ai accepts; `pdf`/`audio`/`video` are dropped) |
+| `name` | `name` | 显示名称 |
+| `contextWindow` | `limit.context` | token 数 |
+| `maxTokens` | `limit.output` | token 数 |
+| `reasoningEfforts` | `reasoning_options[type=effort].values` | 恒等字典 `{high:"high", max:"max"}`；pi-ai 档位之外的取值（`default`/`none`/……）被过滤；`toggle`/`budget_tokens` 选项忽略 |
+| `input` | `modalities.input` | 过滤到 `text`/`image`（pi-ai 仅接受这两种模态；`pdf`/`audio`/`video` 丢弃） |
 
-Models with no catalog match (e.g. a local gateway model like
-`hy3-paid`) are left untouched and listed in the fill report as unmatched.
+目录中无匹配的模型（例如本地网关模型 `hy3-paid`）保持原样，并在补全报告中列为 unmatched。
 
-## Catalog caching & updates
+## 目录缓存与更新
 
-- The catalog is fetched from `https://models.dev/api.json` and cached at
-  `~/.dsh/model-parameters/catalog.json` (~4 MB).
-- A cached catalog is refreshed lazily on the next reconcile once older than
-  `ttlDays` (default **7 days** — "not too frequent").
-- A failed fetch keeps the last good cache; with no cache at all the plugin
-  simply fills nothing until a refresh succeeds.
-- The settings page has an **Update catalog & fill now** button for a forced
-  refresh, and shows the last update time and freshness.
+- 目录从 `https://models.dev/api.json` 拉取，缓存在 `~/.dsh/model-parameters/catalog.json`（约 4 MB）。
+- 缓存超过 `ttlDays`（默认 **7 天**）后，在下一次 reconcile 时惰性刷新。
+- 拉取失败则保留上次成功的缓存；完全没有缓存时插件什么都不补，直到刷新成功。
+- 设置页有 **Update catalog & fill now** 按钮可强制刷新，并显示上次更新时间与新鲜度。
 
-## Settings page
+## 设置页面
 
-A "模型参数补全 / Model Parameters" section appears in DSH settings:
+DSH 设置中会出现一个 "模型参数补全 / Model Parameters" 区块：
 
-- master enable switch plus per-field toggles (`fillName`, `fillContext`,
-  `fillMaxTokens`, `fillReasoning`, `fillInput`);
-- catalog TTL in days;
-- optional `provider → models.dev provider` mapping overrides;
-- catalog freshness card (entries, providers, last update);
-- the last fill report: fields filled, providers touched, and the list of
-  unmatched model ids.
+- 总开关 + 逐字段开关（`fillName`、`fillContext`、`fillMaxTokens`、`fillReasoning`、`fillInput`）；
+- 目录 TTL（天）；
+- 可选的 `provider → models.dev provider` 映射覆盖；
+- 目录新鲜度卡片（条目数、provider 数、上次更新）；
+- 上次补全报告：补全的字段、涉及的 provider、未匹配的模型 id 列表。
 
-Plugin configuration persists in the `model-parameters` settings namespace
-(`~/.dsh/settings.yaml`), e.g.:
+插件配置保存在 `model-parameters` 设置命名空间（`~/.dsh/settings.yaml`），例如：
 
 ```yaml
 model-parameters:
@@ -102,13 +76,35 @@ model-parameters:
     - xai
 ```
 
-## Development
+## 安装
+
+通过 `dsh plugin` 命令安装（`web` 换成你的 profile 名）：
+
+**从 npm 安装**：
+
+```bash
+dsh plugin --profile web add @fonlan/dsh-model-parameters
+```
+
+**直接从 GitHub 安装**：
+
+```bash
+dsh plugin --profile web add github:fonlan/dsh-model-parameters
+```
+
+**卸载**：
+
+```bash
+dsh plugin --profile web remove @fonlan/dsh-model-parameters
+```
+
+## 开发
 
 ```bash
 pnpm install
-pnpm build        # tsc types + tsdown host & client bundles
+pnpm build        # tsc 类型 + tsdown host 与 client bundle
 pnpm typecheck
-node scripts/verify-catalog.mjs   # matching-logic check against a models.dev dump
+node scripts/verify-catalog.mjs   # 用 models.dev dump 校验匹配逻辑
 ```
 
 ## License
