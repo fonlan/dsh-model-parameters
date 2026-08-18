@@ -1,6 +1,6 @@
 {
   "name": "@fonlan/dsh-model-parameters",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "DSH plugin: when a provider's model sync returns only ids, automatically fill display name, context window, max output tokens, reasoning efforts, and input modalities from the models.dev catalog (cached, TTL-refreshed), and surface a settings page with toggles, refresh, and a fill report.",
   "license": "MIT",
   "repository": {
