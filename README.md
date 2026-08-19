@@ -50,6 +50,8 @@ models.dev 把同一模型挂在许多 provider 名下（`deepseek-v4-flash` 出
 
 在 DSH 设置 → **插件 → 插件配置** 中会出现一张 "模型参数补全 / Model Parameters" 可展开卡片（样式与内置插件卡片一致，默认折叠）：
 
+![模型参数补全设置卡片](docs/screenshot-card-zh.png)
+
 - 总开关 + 逐字段开关（`fillName`、`fillContext`、`fillMaxTokens`、`fillReasoning`、`fillInput`）；
 - 目录 TTL（天）；
 - 可选的 `provider → models.dev provider` 映射覆盖；

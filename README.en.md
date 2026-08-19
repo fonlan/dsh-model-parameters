@@ -77,6 +77,8 @@ An expandable "模型参数补全 / Model Parameters" card appears in DSH
 settings → **Plugins → Plugin configuration** (styled like the built-in plugin
 cards, collapsed by default):
 
+![Model Parameters settings card](docs/screenshot-card-en.png)
+
 - master enable switch plus per-field toggles (`fillName`, `fillContext`,
   `fillMaxTokens`, `fillReasoning`, `fillInput`);
 - catalog TTL in days;
