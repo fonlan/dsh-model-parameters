@@ -13,11 +13,7 @@
  * second patch (the next event sees the fields present and produces no ops).
  */
 import type { Context } from '@deepseek-ai/cordis'
-import {
-  settingsNamespace,
-  type SettingsScope,
-  type SettingsPathOp,
-} from '@deepseek-ai/dsh-settings'
+import type { SettingsScope, SettingsPathOp } from '@deepseek-ai/dsh-settings'
 import type { PiAiModelProfile } from '@deepseek-ai/dsh-llm-pi-ai'
 import {
   Config,
@@ -34,8 +30,8 @@ import {
   type CatalogSnapshot,
 } from './catalog.js'
 
-const TARGET = settingsNamespace(TARGET_NS)
-const OWN = settingsNamespace(PLUGIN_NS)
+const TARGET = TARGET_NS
+const OWN = PLUGIN_NS
 
 /** One reconcile run's outcome, surfaced to the settings page. */
 export interface FillReport {

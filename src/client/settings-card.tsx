@@ -15,7 +15,8 @@
  * the `model-parameters` settings namespace (settings.yaml).
  */
 import { useCallback, useEffect, useState, useSyncExternalStore } from 'react'
-import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
+import type { Context } from '@deepseek-ai/cordis'
+type ClientContext = Context
 import type { Translate } from '@deepseek-ai/dsh-client-ui-slots'
 import { LOCALE_NS } from './locales'
 import { api, type PluginState } from './api'
