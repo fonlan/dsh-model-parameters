@@ -6,9 +6,7 @@ export const LOCALE_NS = 'model-parameters'
 
 export const zh = {
   settingsTitle: '模型参数补全',
-  cardSub: '补全字段、目录刷新、Provider 映射与补全报告。',
-  collapse: '收起',
-  expand: '展开',
+  sectionSub: '补全字段、目录刷新、Provider 映射与补全报告。',
   master: '启用自动补全',
   masterDesc: '关闭后不再自动补全任何字段（已补全的值保留）。',
   fields: '补全字段',
@@ -53,9 +51,7 @@ export const zh = {
 
 export const en: Record<keyof typeof zh, string> = {
   settingsTitle: 'Model Parameters',
-  cardSub: 'Field toggles, catalog refresh, provider mapping and the fill report.',
-  collapse: 'Collapse',
-  expand: 'Expand',
+  sectionSub: 'Field toggles, catalog refresh, provider mapping and the fill report.',
   master: 'Enable auto-fill',
   masterDesc: 'When off, no fields are filled (already-filled values are kept).',
   fields: 'Fields to fill',

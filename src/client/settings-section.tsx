@@ -1,15 +1,11 @@
 /**
- * The Model Parameters Settings Card: master + per-field toggles, catalog TTL,
- * provider→models.dev mapping overrides, a manual refresh/fill action, the
- * catalog freshness line, and the last fill report (filled / touched /
- * unmatched).
+ * The Model Parameters settings page (设置 → 侧栏「模型参数补全」).
  *
- * The card registers into the `settings.plugin.item` slot keyed by the
- * `model-parameters` settings namespace, so it renders inside
- * 设置 → 插件 → 插件配置, stacked with the built-in plugin cards. The chrome is
- * self-drawn (external plugins cannot import the built-in PluginCard) with
- * styles aligned to it: an expandable header (collapsed by default) and a body
- * that discloses the controls in place.
+ * Registers into the `settings.section` slot, so the page owns one entry in
+ * the settings sidebar and renders its content in the panel's content column.
+ * Content: master + per-field toggles, catalog TTL, provider→models.dev
+ * mapping overrides, a manual refresh/fill action, the catalog freshness line,
+ * and the last fill report (filled / touched / unmatched).
  *
  * All reads/mutations go through the plugin's fenced API; config persists into
  * the `model-parameters` settings namespace (settings.yaml).
@@ -21,7 +17,7 @@ import type { Translate } from '@deepseek-ai/dsh-client-ui-slots'
 import { LOCALE_NS } from './locales'
 import { api, type PluginState } from './api'
 import type { ModelParametersConfig } from '../shared/config.js'
-import './settings-card.css'
+import './settings-section.css'
 
 function useLocaleRevision(ctx: ClientContext): number {
   const subscribe = useCallback(
@@ -52,7 +48,7 @@ function formatTime(epochMs: number): string {
   }
 }
 
-export function makeSettingsCard(ctx: ClientContext): () => JSX.Element {
+export function makeSettingsSection(ctx: ClientContext): () => JSX.Element {
   const t: Translate = (() => {
     try {
       return ctx.locale.bind(LOCALE_NS) as unknown as Translate
@@ -61,10 +57,8 @@ export function makeSettingsCard(ctx: ClientContext): () => JSX.Element {
     }
   })()
 
-  return function ModelParametersCard(): JSX.Element {
+  return function ModelParametersSettingsSection(): JSX.Element {
     useLocaleRevision(ctx)
-    // Card-local disclosure: collapsed by default, like the built-in plugin cards.
-    const [open, setOpen] = useState(false)
     const [state, setState] = useState<PluginState | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [loading, setLoading] = useState(true)
@@ -140,58 +134,42 @@ export function makeSettingsCard(ctx: ClientContext): () => JSX.Element {
       await patchConfig({ providerMap })
     }, [mappingRows, patchConfig])
 
-    const title = t('settingsTitle')
-
     return (
-      <li className="mp-card" data-open={open ? '' : undefined}>
-        <button type="button" className="mp-card-head" aria-expanded={open}
-          aria-label={(open ? t('collapse') : t('expand')) + '：' + title}
-          onClick={() => setOpen(!open)}>
-          <span className="mp-card-headText">
-            <span className="mp-card-title">{title}</span>
-            <span className="mp-card-sub">{t('cardSub')}</span>
-          </span>
-          <span className="mp-card-chevron" data-open={open ? '' : undefined} aria-hidden="true">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path d="M3.5 5.25L7 8.75L10.5 5.25" stroke="currentColor" strokeWidth="1.5"
-                strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </span>
-        </button>
-        {open && (
-          <div className="mp-card-body">
-            {error !== null && state === null ? (
-              <p className="mp-error">{t('error')}: {error}</p>
-            ) : loading || state === null ? (
-              <p className="mp-muted">{t('saving')}</p>
-            ) : (
-              <ModelParametersCardBody
-                t={t}
-                state={state}
-                error={error}
-                saving={saving}
-                busy={busy}
-                mappingRows={mappingRows}
-                newFrom={newFrom}
-                newTo={newTo}
-                setNewFrom={setNewFrom}
-                setNewTo={setNewTo}
-                setMappingRows={setMappingRows}
-                onPatchConfig={patchConfig}
-                onRefresh={refresh}
-                onReconcile={reconcileNow}
-                onApplyMappings={applyMappings}
-              />
-            )}
-          </div>
+      <div className="mp-page">
+        <header className="mp-page-head">
+          <h3 className="mp-page-title">{t('settingsTitle')}</h3>
+          <p className="mp-page-sub">{t('sectionSub')}</p>
+        </header>
+        {error !== null && state === null ? (
+          <p className="mp-error">{t('error')}: {error}</p>
+        ) : loading || state === null ? (
+          <p className="mp-muted">{t('saving')}</p>
+        ) : (
+          <ModelParametersBody
+            t={t}
+            state={state}
+            error={error}
+            saving={saving}
+            busy={busy}
+            mappingRows={mappingRows}
+            newFrom={newFrom}
+            newTo={newTo}
+            setNewFrom={setNewFrom}
+            setNewTo={setNewTo}
+            setMappingRows={setMappingRows}
+            onPatchConfig={patchConfig}
+            onRefresh={refresh}
+            onReconcile={reconcileNow}
+            onApplyMappings={applyMappings}
+          />
         )}
-      </li>
+      </div>
     )
   }
 }
 
-/** The card body: divider-separated control groups, styled like the built-in cards. */
-function ModelParametersCardBody(props: {
+/** The page body: divider-separated control groups. */
+function ModelParametersBody(props: {
   t: Translate
   state: PluginState
   error: string | null

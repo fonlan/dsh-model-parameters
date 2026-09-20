@@ -1,98 +1,43 @@
 /**
- * Styles for the Model Parameters Settings Card (设置 → 插件 → 插件配置).
+ * Styles for the Model Parameters settings page.
  *
- * The expandable chrome mirrors the built-in plugin cards
- * (dsh-client-ui-settings-plugins PluginCard.module.css): external plugins
- * cannot import PluginCard, so the shell/head/chevron/body are re-drawn with
- * the same tokens and geometry. Inner controls follow the built-in cards'
- * field language (ValueField): border-l2 inputs on bg-layer-3, inverted
- * primary buttons, divider-separated groups.
+ * The page occupies the settings panel's content column: a header (title plus
+ * a one-line summary) over divider-separated control groups. Inner controls
+ * follow the built-in settings language: border-l2 inputs on bg-layer-3,
+ * inverted primary buttons.
  */
 
-/* ── card chrome (aligned with the built-in PluginCard) ─────────────────── */
+/* page layout */
 
-.mp-card {
-  border: 1px solid var(--dsw-alias-border-l2, #2a3346);
-  background: var(--dsw-alias-bg-layer-3, #0d1017);
-  border-radius: 12px;
-  list-style: none;
-  transition: border-color .16s, background .16s;
-}
-
-.mp-card:hover {
-  border-color: var(--dsw-alias-label-dimmed, #4a5468);
-}
-
-.mp-card[data-open] {
-  background: var(--dsw-alias-bg-layer-2, #141a26);
-  border-color: var(--dsw-alias-label-dimmed, #4a5468);
-}
-
-.mp-card-head {
-  appearance: none;
-  width: 100%;
-  font: inherit;
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-  background: transparent;
-  border: 0;
-  border-radius: 12px;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
+.mp-page {
   display: flex;
-}
-
-.mp-card-head:focus-visible {
-  outline: 2px solid var(--dsw-alias-brand-primary, #4f8cff);
-  outline-offset: -2px;
-}
-
-.mp-card-headText {
   flex-direction: column;
-  flex: 1;
-  gap: 4px;
-  min-width: 0;
-  display: flex;
+  gap: 16px;
+  max-width: 720px;
 }
 
-.mp-card-title {
+.mp-page-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mp-page-title {
+  margin: 0;
   color: var(--dsw-alias-label-primary, #e6e6e6);
   font-size: 15px;
   font-weight: 600;
   line-height: 1.4;
 }
 
-.mp-card-sub {
+.mp-page-sub {
+  margin: 0;
   color: var(--dsw-alias-label-tertiary, #8b93a7);
   font-size: 13px;
   line-height: 1.5;
 }
 
-.mp-card-chevron {
-  color: var(--dsw-alias-label-tertiary, #8b93a7);
-  flex: none;
-  transition: transform .16s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.mp-card-chevron[data-open] {
-  transform: rotate(180deg);
-}
-
-.mp-card-body {
-  border-top: 1px solid var(--dsw-alias-border-l2, #2a3346);
-  margin: 0 16px;
-  padding: 12px 0 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* ── body layout ────────────────────────────────────────────────────────── */
+/* body layout */
 
 .mp-body {
   display: flex;
@@ -141,7 +86,7 @@
   line-height: 1.6;
 }
 
-/* ── toggles ────────────────────────────────────────────────────────────── */
+/* toggles */
 
 .mp-toggle {
   display: flex;
@@ -177,7 +122,7 @@
   line-height: 1.5;
 }
 
-/* ── catalog meta / ttl ─────────────────────────────────────────────────── */
+/* catalog meta / ttl */
 
 .mp-meta {
   display: flex;
@@ -198,7 +143,7 @@
   line-height: 1.6;
 }
 
-/* ── inputs (ValueField language) ───────────────────────────────────────── */
+/* inputs */
 
 .mp-input {
   border: 1px solid var(--dsw-alias-border-l2, #2a3346);
@@ -226,7 +171,7 @@
   width: 72px;
 }
 
-/* ── mapping rows ───────────────────────────────────────────────────────── */
+/* mapping rows */
 
 .mp-map-row {
   display: flex;
@@ -244,7 +189,7 @@
   flex: none;
 }
 
-/* ── buttons (PluginCard footer language) ────────────────────────────────── */
+/* buttons */
 
 .mp-actions {
   display: flex;
@@ -291,7 +236,7 @@
   border-color: var(--dsw-alias-label-dimmed, #4a5468);
 }
 
-/* ── report / badges / code ─────────────────────────────────────────────── */
+/* report / badges / code */
 
 .mp-report {
   margin: 0;

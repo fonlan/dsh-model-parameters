@@ -1,12 +1,9 @@
 /**
- * @fonlan/dsh-model-parameters client half: the plugin's own Settings Card.
+ * @fonlan/dsh-model-parameters client half: the plugin's own Settings section.
  *
- * Registers into the `settings.plugin.item` slot keyed by the `model-parameters`
- * settings namespace (the same string the host half registers), so the card
- * appears inside 设置 → 插件 → 插件配置, paired with the namespace by the tab —
- * exactly like @fonlan/dsh-web-auth. The card draws its own expandable chrome
- * (external plugins cannot import the built-in PluginCard) with styles aligned
- * to the built-in plugin cards.
+ * Registers into the settings.section slot, so the page owns one entry in the
+ * settings sidebar and renders in the panel's content column. The page itself
+ * lives in ./settings-section.
  *
  * Deps resolved from the browser module table: react only. The slots service
  * is reached through the cordis context; types come from devDependencies and
@@ -17,16 +14,18 @@ type ClientContext = Context
 import type {} from '@deepseek-ai/dsh-client-locale/client'
 import type {} from '@deepseek-ai/dsh-client-ui-slots'
 import { LOCALE_NS, zh, en } from './locales'
-import { makeSettingsCard } from './settings-card'
+import { makeSettingsSection } from './settings-section'
 
-/** The settings namespace this card edits (must match the host half). */
-const PLUGIN_NS = 'model-parameters'
+/** The settings sidebar entry this page owns (must stay stable). */
+const SECTION_ID = 'model-parameters'
 
 /** The slots service face (subset of @deepseek-ai/dsh-client-ui-slots). */
 interface SlotEntry {
   name: string
-  key?: string
-  inject?: () => unknown
+  id?: string
+  order?: number
+  label?: () => string
+  locale?: string
 }
 
 interface Slots {
@@ -44,12 +43,16 @@ export function apply(ctx: ClientContext): void {
     return () => off()
   }, 'model-parameters: dictionaries')
 
-  const Card = makeSettingsCard(ctx)
+  const t = ctx.locale.bind(LOCALE_NS) as unknown as (key: string) => string
+  const Section = makeSettingsSection(ctx)
   const slots = (ctx as unknown as { slots: Slots }).slots
-  slots.inject('settings.plugin.item', () =>
+  slots.inject('settings.section', () =>
     slots.register({
-      name: 'settings.plugin.item',
-      key: PLUGIN_NS,
-    }, Card),
+      name: 'settings.section',
+      id: SECTION_ID,
+      order: 320,
+      label: () => t('settingsTitle'),
+      locale: LOCALE_NS,
+    }, Section),
   )
 }
