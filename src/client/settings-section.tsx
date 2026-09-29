@@ -8,7 +8,8 @@
  * and the last fill report (filled / touched / unmatched).
  *
  * All reads/mutations go through the plugin's fenced API; config persists into
- * the `model-parameters` settings namespace (settings.yaml).
+ * the `model-parameters` profile entry — the plugin's own loader entry config,
+ * written through the host settings service.
  */
 import { useCallback, useEffect, useState, useSyncExternalStore } from 'react'
 import type { Context } from '@deepseek-ai/cordis'

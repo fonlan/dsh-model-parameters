@@ -8,12 +8,12 @@ DSH 插件：当 provider 的模型同步（或任何设置写入）留下缺失
 
 ## 工作原理
 
-1. 插件监听 `llm-pi-ai` 设置命名空间（`settings/updated`）。任何已提交的变更——新同步的 provider、编辑过的 provider 卡片、手动编辑的 `settings.yaml`——都会触发一次 reconcile。
+1. 插件监听 `llm-pi-ai` 设置命名空间（`settings/document-updated`）。任何已提交的变更——新同步的 provider、编辑过的 provider 卡片、手动编辑的 profile 补丁——都会触发一次 reconcile。
 2. 插件启动时还会对现有配置执行一次全量回填。
 3. 对每个缺少 `name` / `contextWindow` / `maxTokens` / `reasoningEfforts` / `input` 任一字段的模型条目，解析出最佳目录条目，只补全缺失字段（fill-only：已有值绝不覆盖）。
-4. 写入走设置接缝（`ctx.settings.mutate`），即落到 `~/.dsh/settings.yaml`——与你手动编辑的是同一个文件。
+4. 写入走设置接缝（`ctx.settings.mutate`），即落到当前 profile 的补丁文件（`~/.dsh/profiles/<profile>/cordis.patch.yml`）——与你手动编辑的是同一个文件。
 
-reconcile 天然是 fill-only 的，因此它自己的写入不会造成循环：下一次 `settings/updated` 看到字段已存在，不会产生任何操作。
+reconcile 天然是 fill-only 的，因此它自己的写入不会造成循环：下一次 `settings/document-updated` 看到字段已存在，不会产生任何操作。
 
 ## 匹配逻辑
 
@@ -58,24 +58,25 @@ models.dev 把同一模型挂在许多 provider 名下（`deepseek-v4-flash` 出
 - 目录新鲜度（条目数、provider 数、上次更新）；
 - 上次补全报告：补全的字段、涉及的 provider、未匹配的模型 id 列表。
 
-插件配置保存在 `model-parameters` 设置命名空间（`~/.dsh/settings.yaml`），例如：
+插件配置就是它自己的 loader entry config——当前 profile 补丁文件里的 `model-parameters` 条目，例如：
 
 ```yaml
-model-parameters:
-  enabled: true
-  ttlDays: 7
-  fillName: true
-  fillContext: true
-  fillMaxTokens: true
-  fillReasoning: true
-  fillInput: true
-  providerMap: {}
-  officialProviders:
-    - deepseek
-    - openai
-    - anthropic
-    - google
-    - xai
+- id: model-parameters
+  config:
+    enabled: true
+    ttlDays: 7
+    fillName: true
+    fillContext: true
+    fillMaxTokens: true
+    fillReasoning: true
+    fillInput: true
+    providerMap: {}
+    officialProviders:
+      - deepseek
+      - openai
+      - anthropic
+      - google
+      - xai
 ```
 
 ## 安装

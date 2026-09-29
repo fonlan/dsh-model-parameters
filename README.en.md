@@ -14,18 +14,21 @@ could not match.
 
 ## How it works
 
-1. The plugin listens to the `llm-pi-ai` settings namespace (`settings/updated`).
-   Any committed change — a freshly synced provider, an edited provider card, a
-   manual `settings.yaml` edit — triggers a reconcile.
+1. The plugin listens to the `llm-pi-ai` settings namespace
+   (`settings/document-updated`). Any committed change — a freshly synced
+   provider, an edited provider card, a manual profile-patch edit — triggers a
+   reconcile.
 2. On plugin start it also runs one backfill over the existing configuration.
 3. For every model entry missing any of `name` / `contextWindow` / `maxTokens` /
    `reasoningEfforts` / `input`, it resolves the best catalog entry and fills
    only the missing fields (fill-only: present values are never overwritten).
 4. The write goes through the settings seam (`ctx.settings.mutate`), i.e. it
-   lands in `~/.dsh/settings.yaml` — the same file you would edit by hand.
+   lands in the active profile's patch file
+   (`~/.dsh/profiles/<profile>/cordis.patch.yml`) — the same file you would
+   edit by hand.
 
 The reconcile is fill-only by construction, so its own writes cannot loop: the
-next `settings/updated` sees the fields present and produces no ops.
+next `settings/document-updated` sees the fields present and produces no ops.
 
 ## Matching
 
@@ -87,25 +90,26 @@ cards, collapsed by default):
 - the last fill report: fields filled, providers touched, and the list of
   unmatched model ids.
 
-Plugin configuration persists in the `model-parameters` settings namespace
-(`~/.dsh/settings.yaml`), e.g.:
+Plugin configuration IS the plugin's own loader entry config: the
+`model-parameters` entry in the active profile's patch file, e.g.:
 
 ```yaml
-model-parameters:
-  enabled: true
-  ttlDays: 7
-  fillName: true
-  fillContext: true
-  fillMaxTokens: true
-  fillReasoning: true
-  fillInput: true
-  providerMap: {}
-  officialProviders:
-    - deepseek
-    - openai
-    - anthropic
-    - google
-    - xai
+- id: model-parameters
+  config:
+    enabled: true
+    ttlDays: 7
+    fillName: true
+    fillContext: true
+    fillMaxTokens: true
+    fillReasoning: true
+    fillInput: true
+    providerMap: {}
+    officialProviders:
+      - deepseek
+      - openai
+      - anthropic
+      - google
+      - xai
 ```
 
 ## Installation

@@ -6,11 +6,11 @@
  * tokens / reasoning efforts / input modalities (the norm for a freshly
  * synced gateway), it fills the missing fields from a cached models.dev
  * catalog (TTL-refreshed), and serves the fenced JSON API the web settings
- * page calls. The plugin's own toggles live in the `model-parameters`
- * settings namespace (settings.yaml).
+ * page calls. The plugin's own toggles are its loader entry config (the
+ * `model-parameters` profile entry, schema {@link Config}).
  */
 import type { Context } from '@deepseek-ai/cordis'
-import { Config } from './shared/config.js'
+import { Config, type ModelParametersLiveConfig } from './shared/config.js'
 import { ModelParametersService } from './server/service.js'
 import { registerApiRoutes } from './server/rpc.js'
 import {
@@ -32,8 +32,8 @@ export { Config }
 export { CatalogManager, acceptedInputModalities, identityReasoningEfforts }
 export type { CatalogEntry, CatalogSnapshot }
 
-export function apply(ctx: Context): void {
-  const service = new ModelParametersService(ctx)
+export function apply(ctx: Context, config: ModelParametersLiveConfig = {}): void {
+  const service = new ModelParametersService(ctx, config)
 
   ctx.effect(() => {
     service.start()
