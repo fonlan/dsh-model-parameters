@@ -20,6 +20,26 @@ import {
   type CatalogEntry,
   type CatalogSnapshot,
 } from './server/catalog.js'
+import {
+  detectSystemProxy,
+  fetchJsonViaProxy,
+  fetchJsonWithSystemProxy,
+  isLoopbackHost,
+  maskProxyUrl,
+  parseRegistryQuery,
+  parseScutilProxyOutput,
+  resolveCatalogRoute,
+  shouldBypassProxy,
+  transportOf,
+  windowsProxyFromRegistry,
+  type CatalogFetch,
+  type CatalogFetchResult,
+  type CatalogRoute,
+  type CatalogTransport,
+  type CommandRunner,
+  type DetectOptions,
+  type SystemProxyConfig,
+} from './server/system-proxy.js'
 
 export const name = '@fonlan/dsh-model-parameters'
 
@@ -31,6 +51,28 @@ export const inject: string[] = []
 export { Config }
 export { CatalogManager, acceptedInputModalities, identityReasoningEfforts }
 export type { CatalogEntry, CatalogSnapshot }
+export {
+  detectSystemProxy,
+  fetchJsonViaProxy,
+  fetchJsonWithSystemProxy,
+  isLoopbackHost,
+  maskProxyUrl,
+  parseRegistryQuery,
+  parseScutilProxyOutput,
+  resolveCatalogRoute,
+  shouldBypassProxy,
+  transportOf,
+  windowsProxyFromRegistry,
+}
+export type {
+  CatalogFetch,
+  CatalogFetchResult,
+  CatalogRoute,
+  CatalogTransport,
+  CommandRunner,
+  DetectOptions,
+  SystemProxyConfig,
+}
 
 export function apply(ctx: Context, config: ModelParametersLiveConfig = {}): void {
   const service = new ModelParametersService(ctx, config)

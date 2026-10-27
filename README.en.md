@@ -74,6 +74,26 @@ Models with no catalog match (e.g. a local gateway model like
 - The settings card has an **Update catalog & fill now** button for a forced
   refresh, and shows the last update time and freshness.
 
+### System proxy
+
+The catalog download follows proxy settings, on Windows too:
+
+- With `HTTP_PROXY` / `HTTPS_PROXY` / `ALL_PROXY` (either casing) set, the
+  harness's global proxy policy applies — the same route as every other
+  outbound request.
+- With none of those variables set, the operating system's proxy is read:
+  Windows Internet Settings (the `ProxyEnable` / `ProxyServer` /
+  `ProxyOverride` values under the registry's `Internet Settings` key), or the
+  manual HTTP/HTTPS proxy plus exceptions list in macOS Network settings.
+- Otherwise the download connects directly.
+- The settings page shows the **download route** of the last download: direct /
+  environment proxy / Windows system proxy / macOS system proxy (proxy address
+  masked), together with the error when a download failed.
+- Limits: SOCKS proxies and PAC scripts are never evaluated (a PAC-only
+  configuration stays direct and warns — set `HTTPS_PROXY` instead); CIDR
+  bypass entries (`10.0.0.0/8`) are not matched; proxy credentials stored in the
+  OS credential manager are not sent.
+
 ## Settings card
 
 An expandable "模型参数补全 / Model Parameters" card appears in DSH
@@ -140,6 +160,7 @@ dsh plugin --profile web remove @fonlan/dsh-model-parameters
 pnpm install
 pnpm build        # tsc types + tsdown host & client bundles
 pnpm typecheck
+pnpm test         # builds, then checks system-proxy detection, routing and the CONNECT tunnel (scripts/verify-proxy.mjs)
 node scripts/verify-catalog.mjs   # matching-logic check against a models.dev dump
 ```
 

@@ -156,6 +156,8 @@ function stateOf(service: ModelParametersService): unknown {
       fresh: snapshot.fetchedAt > 0
         && Date.now() - snapshot.fetchedAt < config.ttlDays * 24 * 60 * 60 * 1000,
       ttlDays: config.ttlDays,
+      transport: snapshot.transport ?? null,
+      error: snapshot.error ?? null,
     },
     report: service.report(),
   }

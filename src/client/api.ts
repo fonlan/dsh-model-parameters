@@ -1,12 +1,22 @@
 /** Client transport for the model-parameters settings API. */
 import type { ModelParametersConfig } from '../shared/config.js'
 
+export interface CatalogTransportView {
+  kind: 'direct' | 'env' | 'macos' | 'windows'
+  /** Masked proxy URL (no credentials), present when a proxy is actually used. */
+  proxy?: string
+}
+
 export interface CatalogView {
   entries: number
   providers: number
   fetchedAt: number
   fresh: boolean
   ttlDays: number
+  /** Route the last download attempt took (null until one runs). */
+  transport: CatalogTransportView | null
+  /** Message of the last failed download (cleared on success). */
+  error: string | null
 }
 
 export interface FillReportView {

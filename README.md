@@ -46,6 +46,16 @@ models.dev 把同一模型挂在许多 provider 名下（`deepseek-v4-flash` 出
 - 拉取失败则保留上次成功的缓存；完全没有缓存时插件什么都不补，直到刷新成功。
 - 设置卡片有 **立即更新目录并补全** 按钮可强制刷新，并显示上次更新时间与新鲜度。
 
+### 系统代理
+
+目录下载遵循代理设置（包括 Windows）：
+
+- 设置了 `HTTP_PROXY` / `HTTPS_PROXY` / `ALL_PROXY`（大小写均可）时，沿用 DSH 宿主的全局代理策略——与插件其他出站请求走同一条路由。
+- 没有设置这些变量时，自动读取操作系统代理：Windows 的 Internet 选项（注册表 `Internet Settings` 中的 `ProxyEnable` / `ProxyServer` / `ProxyOverride`），macOS 网络设置里的手动 HTTP/HTTPS 代理与排除列表。
+- 两者都没有时直连。
+- 设置页「模型目录」会显示最近一次下载的 **下载经由**：直连 / 环境变量代理 / Windows 系统代理 / macOS 系统代理（代理地址已脱敏）；下载失败时一并显示错误。
+- 限制：SOCKS 代理与 PAC 脚本不会被求值（只配置了 PAC 时保持直连并告警，可改用 `HTTPS_PROXY` 显式指定）；CIDR 形式的绕过条目（如 `10.0.0.0/8`）不匹配；系统凭据管理器保存的代理密码不会发送。
+
 ## 设置卡片
 
 在 DSH 设置 → **插件 → 插件配置** 中会出现一张 "模型参数补全 / Model Parameters" 可展开卡片（样式与内置插件卡片一致，默认折叠）：
@@ -107,6 +117,7 @@ dsh plugin --profile web remove @fonlan/dsh-model-parameters
 pnpm install
 pnpm build        # tsc 类型 + tsdown host 与 client bundle
 pnpm typecheck
+pnpm test         # 构建后校验系统代理探测、路由选择与 CONNECT 隧道（scripts/verify-proxy.mjs）
 node scripts/verify-catalog.mjs   # 用 models.dev dump 校验匹配逻辑
 ```
 

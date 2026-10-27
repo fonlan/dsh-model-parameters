@@ -1,6 +1,10 @@
 /**
  * models.dev catalog: fetch, disk cache, lazy TTL refresh, and id matching.
  *
+ * The download goes through {@link fetchJsonWithSystemProxy}, so it follows the
+ * proxy environment the harness already routes (unchanged) and, when no proxy
+ * variable is set, the operating system's proxy — see system-proxy.ts.
+ *
  * The catalog is flattened into a list of entries keyed by provider, then
  * indexed by the last path segment of the model id (case-insensitive) so a
  * synced bare id like `qwen3.7-max` can resolve `Qwen/Qwen3.7-Max` wherever
@@ -24,6 +28,11 @@ import {
   REASONING_LEVELS,
   type ModelParametersConfig,
 } from '../shared/config.js'
+import {
+  fetchJsonWithSystemProxy,
+  type CatalogFetch,
+  type CatalogTransport,
+} from './system-proxy.js'
 
 /** Structural logger subset satisfied by cordis' LoggerService. */
 export interface CatalogLogger {
@@ -58,6 +67,10 @@ export interface CatalogSnapshot {
   providers: number
   /** Epoch ms the cache was last fetched (0 = never fetched). */
   fetchedAt: number
+  /** Route the last download attempt took; undefined until an attempt runs. */
+  transport?: CatalogTransport
+  /** Message of the last failed download; undefined when the last attempt succeeded. */
+  error?: string
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000
@@ -87,20 +100,25 @@ export class CatalogManager {
   private snapshot: CatalogSnapshot = { entries: [], providers: 0, fetchedAt: 0 }
   private loaded = false
   private inflight: Promise<void> | null = null
+  private transport: CatalogTransport | undefined
+  private fetchError: string | undefined
   private readonly dir: string
   private readonly cachePath: string
+  private readonly fetchJson: CatalogFetch
 
   constructor(
     private readonly logger: CatalogLogger,
     dataDir?: string,
+    fetchJson?: CatalogFetch,
   ) {
     this.dir = dataDir ?? join(homedir(), '.dsh', 'model-parameters')
     this.cachePath = join(this.dir, 'catalog.json')
+    this.fetchJson = fetchJson ?? ((url, timeoutMs) => fetchJsonWithSystemProxy(url, timeoutMs, logger))
   }
 
-  /** The current snapshot (empty until the first load/fetch completes). */
+  /** The current snapshot, including the route and error of the last download attempt. */
   snapshotOf(): CatalogSnapshot {
-    return this.snapshot
+    return { ...this.snapshot, transport: this.transport, error: this.fetchError }
   }
 
   /**
@@ -122,10 +140,14 @@ export class CatalogManager {
       return true
     }
     this.inflight = this.fetchAndPersist()
+      .then(() => {
+        this.fetchError = undefined
+      })
       .catch((error) => {
-        this.logger.warn(
-          `model-parameters: catalog fetch failed (${error instanceof Error ? error.message : String(error)}); using cached copy`,
-        )
+        this.fetchError = error instanceof Error ? error.message : String(error)
+        const attempted = (error as { transport?: CatalogTransport }).transport
+        if (attempted !== undefined) this.transport = attempted
+        this.logger.warn(`model-parameters: catalog fetch failed (${this.fetchError}); using cached copy`)
       })
       .finally(() => {
         this.inflight = null
@@ -208,23 +230,17 @@ export class CatalogManager {
   }
 
   private async fetchAndPersist(): Promise<void> {
-    const controller = new AbortController()
-    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
-    let response: Response
-    try {
-      response = await fetch(CATALOG_URL, { signal: controller.signal, headers: { accept: 'application/json' } })
-    } finally {
-      clearTimeout(timer)
+    const { body, transport } = await this.fetchJson(CATALOG_URL, FETCH_TIMEOUT_MS)
+    if (typeof body !== 'object' || body === null) {
+      throw new Error('catalog response is not a JSON object')
     }
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status} ${response.statusText}`)
-    }
-    const body = (await response.json()) as Record<string, unknown>
+    const document = body as Record<string, unknown>
     const fetchedAt = Date.now()
-    this.snapshot = this.buildSnapshot(body, fetchedAt)
+    this.snapshot = this.buildSnapshot(document, fetchedAt)
     await mkdir(this.dir, { recursive: true })
-    const doc: CacheDocument = { fetchedAt, body }
+    const doc: CacheDocument = { fetchedAt, body: document }
     await writeFile(this.cachePath, JSON.stringify(doc), 'utf8')
+    this.transport = transport
     this.logger.info(
       `model-parameters: catalog refreshed from models.dev (${this.snapshot.providers} providers, ${this.snapshot.entries.length} models)`,
     )

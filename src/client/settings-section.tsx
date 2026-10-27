@@ -16,7 +16,7 @@ import type { Context } from '@deepseek-ai/cordis'
 type ClientContext = Context
 import type { Translate } from '@deepseek-ai/dsh-client-ui-slots'
 import { LOCALE_NS } from './locales'
-import { api, type PluginState } from './api'
+import { api, type CatalogTransportView, type PluginState } from './api'
 import type { ModelParametersConfig } from '../shared/config.js'
 import './settings-section.css'
 
@@ -46,6 +46,20 @@ function formatTime(epochMs: number): string {
     return new Date(epochMs).toLocaleString()
   } catch {
     return String(epochMs)
+  }
+}
+
+/** Localized label for the route the last catalog download took. */
+function routeLabel(t: Translate, transport: CatalogTransportView): string {
+  switch (transport.kind) {
+    case 'env':
+      return t('routeEnv')
+    case 'macos':
+      return t('routeMacos')
+    case 'windows':
+      return t('routeWindows')
+    default:
+      return t('routeDirect')
   }
 }
 
@@ -267,7 +281,17 @@ function ModelParametersBody(props: {
               }}
             />
           </label>
+          {catalog.transport != null && (
+            <span>
+              {t('catalogRoute')}:{' '}
+              <strong>{routeLabel(t, catalog.transport)}</strong>
+              {catalog.transport.proxy !== undefined && <> <code className="mp-code">{catalog.transport.proxy}</code></>}
+            </span>
+          )}
         </div>
+        {catalog.error != null && (
+          <p className="mp-error">{t('catalogDownloadFailed')}: {catalog.error}</p>
+        )}
         <div className="mp-actions">
           <button className="mp-button" disabled={busy} onClick={() => void onRefresh()}>
             {busy ? t('refreshBusy') : t('refresh')}
