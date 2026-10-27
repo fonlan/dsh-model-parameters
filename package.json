@@ -1,6 +1,6 @@
 {
   "name": "@fonlan/dsh-model-parameters",
-  "version": "0.1.9",
+  "version": "0.2.0",
   "description": "DSH plugin: when a provider's model sync returns only ids, automatically fill display name, context window, max output tokens, reasoning efforts, and input modalities from the models.dev catalog (cached, TTL-refreshed), and surface a settings page with toggles, refresh, and a fill report.",
   "license": "MIT",
   "repository": {
@@ -49,6 +49,7 @@
     "build": "rm -rf lib && tsc -p tsconfig.build.json && tsdown",
     "prepare": "npm run build",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.client.json",
+    "test": "pnpm build && node scripts/verify-proxy.mjs",
     "watch": "tsdown --watch",
     "release:patch": "npm version patch && git push && git push --tags",
     "release:minor": "npm version minor && git push && git push --tags",
